@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: fiber_api
+    restart: always
+    environment:
+      DB_HOST: fiber_postgres # Phải trùng với container_name của DB
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-password123}
+      DB_NAME: ${DB_NAME:-finance_db}
+    networks:
+      - postgres_net
+    ports:
+      - "3000:3000"
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: fiber_admin
+    restart: always
+    depends_on:
+      - api
+    networks:
+      - postgres_net
+    ports:
+      - "8080:80"
+
+networks:
+  postgres_net:
+    external: true
+    name: 1_docker_default
