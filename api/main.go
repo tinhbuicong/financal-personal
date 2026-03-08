@@ -20,8 +20,8 @@ func main() {
 	// Connect to database
 	config.ConnectDB()
 
-	// Auto migrate the Transaction model
-	if err := config.DB.AutoMigrate(&models.Transaction{}); err != nil {
+	// Auto migrate the models
+	if err := config.DB.AutoMigrate(&models.Transaction{}, &models.ProjectConfig{}); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
@@ -29,9 +29,13 @@ func main() {
 	app := fiber.New()
 
 	// Define routes
+	app.Get("/transactions", handlers.GetAllTransactions)
 	app.Post("/transactions", handlers.CreateTransaction)
 	app.Get("/transactions/daily", handlers.GetDailyTransactions)
 	app.Get("/transactions/summary", handlers.GetSummary)
+	
+	app.Get("/config/project", handlers.GetProjectConfig)
+	app.Post("/config/project", handlers.UpdateProjectConfig)
 
 	// Start the server on port 3000
 	log.Fatal(app.Listen(":3000"))

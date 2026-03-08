@@ -70,3 +70,41 @@ func GetSummary(c fiber.Ctx) error {
 		"total_outcome": totalOutcome,
 	})
 }
+
+func GetAllTransactions(c fiber.Ctx) error {
+	var transactions []models.Transaction
+
+	if err := config.DB.Order("date desc").Find(&transactions).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Could not fetch transactions",
+		})
+	}
+
+	return c.JSON(transactions)
+}
+
+func GetProjectConfig(c fiber.Ctx) error {
+	var configData models.ProjectConfig
+	if err := config.DB.First(&configData).Error; err != nil {
+		// If not found, create a default one
+		configData = models.ProjectConfig{ExpectedDailyRevenue: 0}
+		config.DB.Create(&configData)
+	}
+	return c.JSON(configData)
+}
+
+func UpdateProjectConfig(c fiber.Ctx) error {
+	var configData models.ProjectConfig
+	if err := c.Bind().JSON(&configData); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+	}
+
+	var existing models.ProjectConfig
+	if err := config.DB.First(&existing).Error; err != nil {
+		config.DB.Create(&configData)
+	} else {
+		config.DB.Model(&existing).Update("expected_daily_revenue", configData.ExpectedDailyRevenue)
+	}
+
+	return c.JSON(configData)
+}

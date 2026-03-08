@@ -10,5 +10,5 @@ type Transaction struct {
 	Type     string    `json:"type"` // "income" or "outcome"
 	Category string    `json:"category"`
 	Note     string    `json:"note"`
-	Date     time.Time `json:"date" gorm:"type:timestamp"`
+	Date     time.Time `json:"date" gorm:"type:date"`
 }
