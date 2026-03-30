@@ -10,9 +10,9 @@
 
 <div class="summary-cards-wrapper">
   <section class="summary-cards">
-    <div class="card">
+    <div class="card compact-card">
       <h3>Chi tiêu (Tháng này)</h3>
-      <div class="amount outcome">{formatVND(monthlyOutcome)}</div>
+      <div class="amount outcome highlight">{formatVND(monthlyOutcome)}</div>
     </div>
   </section>
 
