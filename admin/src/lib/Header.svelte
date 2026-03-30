@@ -1,20 +1,35 @@
 <script lang="ts">
-  // Header component representing the top bar area
+  function navigate(e: MouseEvent, path: string) {
+    e.preventDefault();
+    history.pushState(null, "", path);
+    window.dispatchEvent(new Event("navigate"));
+  }
 </script>
 
 <header class="top-header">
   <div class="header-left">
     <button class="back-btn">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      <svg
+        width="16"
+        height="16"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M15 19l-7-7 7-7"
+        />
       </svg>
       Back
     </button>
-    
+
     <nav class="breadcrumbs">
-      <a href="#home">Home</a>
+      <a href="/home" onclick={(e) => navigate(e, "/home")}>Home</a>
       <span class="separator">/</span>
-      <a href="#events">Events</a>
+      <a href="/events" onclick={(e) => navigate(e, "/events")}>Events</a>
       <span class="separator">/</span>
       <span class="current">Calendar</span>
     </nav>

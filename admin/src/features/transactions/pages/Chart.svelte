@@ -4,6 +4,10 @@
     transactionService,
     type Transaction,
   } from "../services/transaction.service";
+  import {
+    categoryService,
+    type CategoryMapping,
+  } from "../services/category.service";
   import { formatVND } from "../../../utils/money";
 
   let chartData = $state<{ category: string; amount: number }[]>([]);
@@ -12,7 +16,10 @@
   async function fetchData() {
     try {
       loading = true;
-      const all = await transactionService.getTransactions();
+      const [all, mappings] = await Promise.all([
+        transactionService.getTransactions(),
+        categoryService.getMappings(),
+      ]);
 
       // Filter for current month
       const now = new Date();
@@ -28,11 +35,15 @@
         );
       });
 
-      // Group by category
+      // Group by category (or group name if mapping exists)
       const grouped = new Map<string, number>();
       currentMonthTransactions.forEach((t) => {
-        const existing = grouped.get(t.category) || 0;
-        grouped.set(t.category, existing + t.amount);
+        const mapping = mappings.find((m) => m.category_name === t.category);
+        const displayName =
+          mapping && mapping.group_name ? mapping.group_name : t.category;
+
+        const existing = grouped.get(displayName) || 0;
+        grouped.set(displayName, existing + t.amount);
       });
 
       // Convert to array and sort by amount descending
@@ -94,6 +105,7 @@
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     min-height: 500px;
+    margin: 0 auto;
   }
 
   .chart-wrapper {
@@ -120,23 +132,23 @@
   .bars {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    width: 100%;
-    padding: 1rem 0;
+    gap: 1rem;
+    width: 90%;
+    padding: 0.5rem 0;
   }
 
   .bar-group {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
     width: 100%;
   }
 
   .category-name {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-primary);
-    width: 120px;
+    width: 100px;
     text-align: right;
     flex-shrink: 0;
     overflow: hidden;
@@ -149,7 +161,7 @@
     display: flex;
     align-items: center;
     position: relative;
-    height: 32px;
+    height: 20px;
     background: #f1f5f9;
     border-radius: 4px;
     padding-right: 60px; /* Space for the value at the end */

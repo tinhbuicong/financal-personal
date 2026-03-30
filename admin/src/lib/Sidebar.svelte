@@ -1,14 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  let currentHash = $state(window.location.hash || "#calendar");
+  let currentPath = $state(
+    window.location.pathname === "/" ? "/calendar" : window.location.pathname,
+  );
 
   onMount(() => {
-    const handleHashChange = () => {
-      currentHash = window.location.hash || "#calendar";
+    const handleNavigation = () => {
+      currentPath =
+        window.location.pathname === "/"
+          ? "/calendar"
+          : window.location.pathname;
     };
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
+    window.addEventListener("popstate", handleNavigation);
+    window.addEventListener("navigate", handleNavigation);
+    return () => {
+      window.removeEventListener("popstate", handleNavigation);
+      window.removeEventListener("navigate", handleNavigation);
+    };
   });
 
   const menuItems = [
@@ -28,9 +37,9 @@
       label: "Time",
     },
     {
-      id: "mail",
-      icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-      label: "Messages",
+      id: "category-groups",
+      icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z",
+      label: "Category Groups",
     },
     {
       id: "chart",
@@ -65,15 +74,35 @@
   <!-- Top brand area -->
   <div class="brand">
     <div class="logo">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 4C9.373 4 4 9.373 4 16c0 6.627 5.373 12 12 12s12-5.373 12-12c0-6.627-5.373-12-12-12zm0 4c4.418 0 8 3.582 8 8s-3.582 8-8 8-8-3.582-8-8 3.582-8 8-8z" fill="#F59E0B"/>
-        <path d="M12 16a4 4 0 108 0 4 4 0 00-8 0z" fill="#10B981"/>
-        <path d="M16 10a6 6 0 00-6 6h12a6 6 0 00-6-6z" fill="#EF4444"/>
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M16 4C9.373 4 4 9.373 4 16c0 6.627 5.373 12 12 12s12-5.373 12-12c0-6.627-5.373-12-12-12zm0 4c4.418 0 8 3.582 8 8s-3.582 8-8 8-8-3.582-8-8 3.582-8 8-8z"
+          fill="#F59E0B"
+        />
+        <path d="M12 16a4 4 0 108 0 4 4 0 00-8 0z" fill="#10B981" />
+        <path d="M16 10a6 6 0 00-6 6h12a6 6 0 00-6-6z" fill="#EF4444" />
       </svg>
     </div>
     <button class="menu-btn" aria-label="Toggle Menu">
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      <svg
+        width="24"
+        height="24"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="#f97316"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
       </svg>
     </button>
   </div>
@@ -82,9 +111,14 @@
     <nav class="menu-items">
       {#each menuItems as item}
         <a
-          href="#{item.id}"
-          class="menu-item {currentHash === '#' + item.id ? 'active' : ''}"
+          href="/{item.id}"
+          class="menu-item {currentPath === '/' + item.id ? 'active' : ''}"
           title={item.label}
+          onclick={(e) => {
+            e.preventDefault();
+            history.pushState(null, "", "/" + item.id);
+            window.dispatchEvent(new Event("navigate"));
+          }}
         >
           <div class="icon-wrapper">
             <svg

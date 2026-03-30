@@ -8,6 +8,7 @@ import (
 	"api/models"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -21,33 +22,35 @@ func main() {
 	config.ConnectDB()
 
 	// Auto migrate the models
-	if err := config.DB.AutoMigrate(&models.Transaction{}, &models.ProjectConfig{}); err != nil {
+	if err := config.DB.AutoMigrate(&models.Transaction{}, &models.ProjectConfig{}, &models.CategoryMapping{}); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
 	// Initialize Fiber
 	app := fiber.New()
 
-	// CORS
-	app.Use(func(c fiber.Ctx) error {
-		c.Set("Access-Control-Allow-Origin", "*")
-		c.Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
-		c.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		if c.Method() == "OPTIONS" {
-			return c.SendStatus(fiber.StatusNoContent)
-		}
-		return c.Next()
-	})
+	// CORS - Must be placed before any routes
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
+		AllowCredentials: false,
+	}))
 
 	// Define routes
-	app.Get("/transactions", handlers.GetAllTransactions)
-	app.Post("/transactions", handlers.CreateTransaction)
-	app.Get("/transactions/daily", handlers.GetDailyTransactions)
-	app.Get("/transactions/summary", handlers.GetSummary)
-	
-	app.Get("/config/project", handlers.GetProjectConfig)
-	app.Post("/config/project", handlers.UpdateProjectConfig)
+	app.Get("/api/transactions", handlers.GetAllTransactions)
+	app.Post("/api/transactions", handlers.CreateTransaction)
+	app.Get("/api/transactions/daily", handlers.GetDailyTransactions)
+	app.Get("/api/transactions/summary", handlers.GetSummary)
 
-	// Start the server on port 3000
-	log.Fatal(app.Listen(":3000"))
+	app.Get("/api/config/project", handlers.GetProjectConfig)
+	app.Post("/api/config/project", handlers.UpdateProjectConfig)
+
+	app.Get("/api/category-mappings", handlers.GetAllCategoryMappings)
+	app.Put("/api/category-mappings", handlers.UpdateCategoryMapping)
+	// Use ID for reliable deletion
+	app.Delete("/api/category-mappings/:id", handlers.DeleteCategoryMapping)
+
+	// Start the server on all interfaces to avoid IPv4/IPv6 mismatches
+	log.Fatal(app.Listen("0.0.0.0:3000"))
 }

@@ -4,21 +4,32 @@
   import Header from "./lib/Header.svelte";
   import Calendar from "./features/transactions/pages/Calendar.svelte";
   import Chart from "./features/transactions/pages/Chart.svelte";
+  import CategoryGroups from "./features/transactions/pages/CategoryGroups.svelte";
 
-  let currentPage = $state(window.location.hash || "#calendar");
+  let currentPage = $state(window.location.pathname === "/" ? "/calendar" : window.location.pathname);
 
   onMount(() => {
-    const handleHashChange = () => {
-      currentPage = window.location.hash || "#calendar";
+    const handleNavigation = () => {
+      currentPage = window.location.pathname === "/" ? "/calendar" : window.location.pathname;
     };
-    window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("popstate", handleNavigation);
+    window.addEventListener("navigate", handleNavigation);
 
-    // Initial redirect if hash is empty
-    if (!window.location.hash) {
-      window.location.hash = "#calendar";
+    // Initial redirect if path is root
+    if (window.location.pathname === "/") {
+      history.replaceState(null, "", "/calendar");
+      currentPage = "/calendar";
+    } else if (window.location.hash) {
+      // Migrate from hash if present
+      const path = window.location.hash.substring(1);
+      history.replaceState(null, "", `/${path}`);
+      currentPage = `/${path}`;
     }
 
-    return () => window.removeEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("popstate", handleNavigation);
+      window.removeEventListener("navigate", handleNavigation);
+    };
   });
 </script>
 
@@ -27,16 +38,26 @@
   <div class="content-wrapper">
     <Header />
     <main class="container">
-      {#if currentPage === "#calendar"}
+      {#if currentPage === "/calendar"}
         <Calendar />
-      {:else if currentPage === "#chart"}
+      {:else if currentPage === "/chart"}
         <Chart />
+      {:else if currentPage === "/category-groups"}
+        <CategoryGroups />
       {:else}
         <div class="not-found">
           <section class="calendar-header-controls">
             <h2>Trường hợp này chưa được phát triển</h2>
           </section>
-          <a href="#calendar" class="nav-btn">Quay lại Calendar</a>
+          <a
+            href="/calendar"
+            class="nav-btn"
+            onclick={(e) => {
+              e.preventDefault();
+              history.pushState(null, "", "/calendar");
+              window.dispatchEvent(new Event("navigate"));
+            }}>Quay lại Calendar</a
+          >
         </div>
       {/if}
     </main>
