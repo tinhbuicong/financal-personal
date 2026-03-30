@@ -23,8 +23,8 @@
         <path d="M16 10a6 6 0 00-6 6h12a6 6 0 00-6-6z" fill="#EF4444"/>
       </svg>
     </div>
-    <button class="menu-btn">
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#475569" stroke-width="2">
+    <button class="menu-btn" aria-label="Toggle Menu">
+      <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#f97316" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
     </button>
@@ -104,7 +104,7 @@
   }
 
   .sidebar-panel {
-    background: #6366f1; /* Indigo */
+    background: white;
     border-radius: 30px;
     flex: 1;
     display: flex;
@@ -112,10 +112,11 @@
     align-items: center;
     padding: 24px 0;
     width: 72px;
-    margin-left: 4px; /* Align with brand slightly */
-    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    margin-left: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
+    border: 1px solid #f1f5f9;
   }
   
   /* Semi-circle decoration behind active item */
@@ -140,7 +141,8 @@
   }
 
   .menu-item {
-    color: rgba(255,255,255,0.7);
+    color: #f97316; /* Base orange for icons */
+    opacity: 0.6;
     text-decoration: none;
     display: flex;
     justify-content: center;
@@ -163,16 +165,17 @@
   }
 
   .menu-item:hover {
-    color: white;
+    opacity: 1;
   }
 
   .menu-item.active {
-    color: #6366f1;
+    opacity: 1;
+    color: #f97316;
   }
 
   .menu-item.active .icon-wrapper {
-    background: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    background: #fff7ed; /* Very light orange bg for active */
+    box-shadow: 0 4px 10px rgba(249, 115, 22, 0.15);
   }
 
   .badge {
@@ -189,7 +192,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #6366f1;
+    border: 2px solid white;
   }
 
   .sidebar-footer {
@@ -229,7 +232,7 @@
   }
 
   .user-name {
-    color: white;
+    color: #475569;
     font-size: 10px;
     font-weight: 500;
   }
