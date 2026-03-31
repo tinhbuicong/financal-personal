@@ -1,22 +1,22 @@
 services:
-  db:
-    image: postgres:17-alpine
-    container_name: fiber_postgres
-    restart: always
-    environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
-      POSTGRES_DB: ${DB_NAME:-finance_db}
-    ports:
-      - "5432:5432"
-    networks:
-      - finance_network
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  # db:
+  #   image: postgres:17-alpine
+  #   container_name: fiber_postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: ${DB_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+  #     POSTGRES_DB: ${DB_NAME:-finance_db}
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - finance_network
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
 
   api:
     build:
-      context: ./api
+      context: ../api
       dockerfile: Dockerfile
     container_name: fiber_api
     restart: always
@@ -33,7 +33,7 @@ services:
 
   admin:
     build:
-      context: ./admin
+      context: ../admin
       dockerfile: Dockerfile
     container_name: fiber_admin
     restart: always
