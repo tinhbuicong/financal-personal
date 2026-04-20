@@ -30,7 +30,7 @@
       category = "";
       note = "";
       type = "outcome";
-      showModal = false;
+      closeModal();
       refreshData();
     } catch (error) {
       console.error("Failed to submit transaction", error);
@@ -38,6 +38,8 @@
       submitting = false;
     }
   }
+
+  $: console.log("showModal", showModal);
 </script>
 
 {#if showModal}

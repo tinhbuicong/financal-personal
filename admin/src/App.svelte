@@ -6,11 +6,16 @@
   import Chart from "./features/transactions/pages/Chart.svelte";
   import CategoryGroups from "./features/transactions/pages/CategoryGroups.svelte";
 
-  let currentPage = $state(window.location.pathname === "/" ? "/calendar" : window.location.pathname);
+  let currentPage = $state(
+    window.location.pathname === "/" ? "/calendar" : window.location.pathname,
+  );
 
   onMount(() => {
     const handleNavigation = () => {
-      currentPage = window.location.pathname === "/" ? "/calendar" : window.location.pathname;
+      currentPage =
+        window.location.pathname === "/"
+          ? "/calendar"
+          : window.location.pathname;
     };
     window.addEventListener("popstate", handleNavigation);
     window.addEventListener("navigate", handleNavigation);
