@@ -1,5 +1,4 @@
-import api from "../../../services/api.service";
-
+import apiClient from "../../../services/api.service";
 
 export interface Transaction {
   id?: number;
@@ -12,21 +11,21 @@ export interface Transaction {
   updated_at?: string;
 }
 
-
 export const transactionService = {
   getTransactions: async (params?: { start_date?: string; end_date?: string }): Promise<Transaction[]> => {
-    return api.get("/transactions", { params });
+    return apiClient.get("transactions", { params });
   },
 
   createTransaction: async (data: Transaction): Promise<Transaction> => {
-    return api.post("/transactions", data);
+    return apiClient.post("transactions", data);
   },
 
-  updateTransaction: async (id: string, data: Partial<Transaction>): Promise<Transaction> => {
-    return api.put(`/transactions/${id}`, data);
+  updateTransaction: async (id: number, data: Partial<Transaction>): Promise<Transaction> => {
+    const response = await apiClient.put(`transactions/${id}`, data);
+    return response.data;
   },
 
-  deleteTransaction: async (id: string): Promise<void> => {
-    return api.delete(`/transactions/${id}`);
+  deleteTransaction: async (id: number): Promise<void> => {
+    await apiClient.delete(`transactions/${id}`);
   }
 };

@@ -22,7 +22,14 @@ func main() {
 	config.ConnectDB()
 
 	// Auto migrate the models
-	if err := config.DB.AutoMigrate(&models.Transaction{}, &models.ProjectConfig{}, &models.CategoryMapping{}); err != nil {
+	if err := config.DB.AutoMigrate(
+		&models.Transaction{},
+		&models.ProjectConfig{},
+		&models.CategoryMapping{},
+		&models.GoldPrice{},
+		&models.SilverPrice{},
+		&models.SJCPrice{},
+	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
@@ -38,19 +45,38 @@ func main() {
 	}))
 
 	// Define routes
-	app.Get("/api/transactions", handlers.GetAllTransactions)
-	app.Post("/api/transactions", handlers.CreateTransaction)
-	app.Get("/api/transactions/daily", handlers.GetDailyTransactions)
-	app.Get("/api/transactions/summary", handlers.GetSummary)
+	api := app.Group("/api")
 
-	app.Get("/api/config/project", handlers.GetProjectConfig)
-	app.Post("/api/config/project", handlers.UpdateProjectConfig)
+	// Test route
+	api.Get("/ping", func(c fiber.Ctx) error {
+		return c.SendString("pong")
+	})
 
-	app.Get("/api/category-mappings", handlers.GetAllCategoryMappings)
-	app.Put("/api/category-mappings", handlers.UpdateCategoryMapping)
-	// Use ID for reliable deletion
-	app.Delete("/api/category-mappings/:id", handlers.DeleteCategoryMapping)
+	// Transaction routes
+	api.Get("/transactions", handlers.GetAllTransactions)
+	api.Post("/transactions", handlers.CreateTransaction)
+	api.Get("/transactions/daily", handlers.GetDailyTransactions)
+	api.Get("/transactions/summary", handlers.GetSummary)
 
-	// Start the server on all interfaces to avoid IPv4/IPv6 mismatches
-	log.Fatal(app.Listen("0.0.0.0:3000"))
+	// Config routes
+	api.Get("/config/project", handlers.GetProjectConfig)
+	api.Post("/config/project", handlers.UpdateProjectConfig)
+
+	// Category mapping routes
+	api.Get("/category-mappings", handlers.GetAllCategoryMappings)
+	api.Put("/category-mappings", handlers.UpdateCategoryMapping)
+	api.Delete("/category-mappings/:id", handlers.DeleteCategoryMapping)
+
+	// Metal Prices routes
+	log.Println("Registering /api/metals routes")
+	api.Get("/gold/latest", handlers.GetLatestGoldPrice)
+	api.Get("/gold/history", handlers.GetGoldPriceHistory)
+	api.Get("/silver/latest", handlers.GetLatestSilverPrice)
+	api.Get("/silver/history", handlers.GetSilverPriceHistory)
+	api.Get("/sjc/latest", handlers.GetLatestSJCPrice)
+	api.Get("/sjc/history", handlers.GetSJCPriceHistory)
+	api.Post("/metals/sync", handlers.SyncAllMetals)
+
+	// Start the server
+	log.Fatal(app.Listen(":3000"))
 }

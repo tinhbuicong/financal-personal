@@ -8,14 +8,14 @@ export interface CategoryMapping {
 
 export const categoryService = {
   getMappings: async (): Promise<CategoryMapping[]> => {
-    return api.get("/category-mappings");
+    return api.get("category-mappings");
   },
 
   updateMapping: async (mapping: CategoryMapping): Promise<CategoryMapping> => {
-    return api.put("/category-mappings", mapping);
+    return api.put("category-mappings", mapping);
   },
 
   deleteMapping: async (id: number): Promise<void> => {
-    return api.delete(`/category-mappings/${id}`);
+    await api.delete(`category-mappings/${id}`);
   },
 };
