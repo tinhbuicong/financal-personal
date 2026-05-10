@@ -40,7 +40,7 @@ export function TransactionDialog({
   
   const allCategories = useMemo(() => {
     const fromGroups = Object.values(groups).flatMap(g => g.map(c => c.name));
-    return Array.from(new Set([...fromGroups, ...unassigned])).sort();
+    return ["Date", ...Array.from(new Set([ ...fromGroups, ...unassigned])).sort()];
   }, [groups, unassigned]);
 
   const {
@@ -156,7 +156,7 @@ export function TransactionDialog({
                           errors.amount ? "border-red-100 bg-red-50 text-red-600" : "border-slate-100 bg-slate-50/50 focus:border-orange-200 focus:bg-white"
                         }`}
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">.000đ</span>
+                      <span className="absolute right-[45px] top-1/2 -translate-y-1/2 font-bold text-slate-400">.000đ</span>
                     </div>
                     {errors.amount && <p className="text-[10px] font-bold text-red-500 ml-1">{errors.amount.message}</p>}
                   </div>

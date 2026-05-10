@@ -12,7 +12,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
-const menuItems = [
+interface MenuItem {
+  id: string;
+  icon: any;
+  href: string;
+  badge?: string | number;
+}
+
+const menuItems: MenuItem[] = [
   { id: "home", icon: Home, href: "/" },
   { id: "wallet", icon: Wallet, href: "/metals" },
   { id: "category", icon: Folder, href: "/category-groups" },

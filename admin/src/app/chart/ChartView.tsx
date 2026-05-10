@@ -75,7 +75,7 @@ export default function ChartView() {
                 iconSize={8}
                 wrapperStyle={{ fontSize: '11px', paddingTop: '20px' }}
               />
-              {categoryList.map((category, index) => (
+              {(categoryList || []).map((category, index) => (
                 <Line
                   key={category}
                   type="monotone"

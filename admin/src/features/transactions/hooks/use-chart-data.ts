@@ -14,7 +14,7 @@ export function useChartData() {
   });
 
   const chartData = useMemo(() => {
-    if (!transactions.length) return { monthlyData: [], yearlyData: [] };
+    if (!transactions.length) return { monthlyData: [], yearlyData: [], categoryList: [] };
 
     const now = new Date();
     const currentMonth = now.getMonth();
